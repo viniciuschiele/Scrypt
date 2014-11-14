@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Scrypt.NET</id>
+        <version>1.0.0</version>
+        <title>Scrypt.NET</title>
+        <authors>viniciuschiele</authors>
+        <owners>Vinicius Chiele</owners>
+        <projectUrl>https://github.com/viniciuschiele/scrypt</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A .NET implementation of scrypt password hash algorithm. This library has been written purely in C#, it has no dependencies or P/Invoke</description>
+        <copyright>Vinicius Chiele</copyright>
+        <language>en-US</language>
+        <tags>scrypt password hash hashing crypto cryptographic cryptographiy</tags>
+    </metadata>
+    <files>
+        <file src="bin\Release\Scrypt.dll" target="lib\net20\Scrypt.dll" />
+    </files>
+</package>
