@@ -27,4 +27,4 @@ It works perfectly in Linux and OSX using [mono](http://www.mono-project.com), I
 Install via NuGet: Install-Package Scrypt.NET
 
 ##Feedback
-Please use the [Issues](https://github.com/aero-project/scrypt/issues) for feature requests and troubleshooting usage.
+Please use the [Issues](https://github.com/viniciuschiele/scrypt/issues) for feature requests and troubleshooting usage.
