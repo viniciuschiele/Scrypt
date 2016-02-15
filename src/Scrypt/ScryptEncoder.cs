@@ -115,7 +115,7 @@ namespace Scrypt
 
             ExtractHeader(hashedPassword, out iterationCount, out blockSize, out threadCount, out saltBytes);
 
-            return Encode(password, saltBytes, iterationCount, blockSize, threadCount) == hashedPassword;
+            return SafeEquals(Encode(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
         }
 
         /// <summary>
@@ -530,6 +530,26 @@ namespace Scrypt
 
                 Buffer.BlockCopy(T, 0, derivedKey, (i - 1) * 32, (i == blockCount ? r : 32));
             }
+        }
+        
+        /// <summary>
+        /// Checks if two strings are equal. Compares every char to prevent timing attacks.
+        /// </summary>
+        /// <param name="a">String to compare.</param>
+        /// <param name="b">String to compare.</param>
+        /// <returns>True if both strings are equal</returns>
+        private static bool SafeEquals(string a, string b)
+        {
+            if (a.Length != b.Length) {
+                return False;
+            }
+            uint diff = 0;
+ 
+            for (int i = 0; i < a.Length; i++) {
+                diff |= (uint)a[i] ^ (uint)b[i];
+            }
+ 
+            return diff == 0;
         }
 
         #endregion
