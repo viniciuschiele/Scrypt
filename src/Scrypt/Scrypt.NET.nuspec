@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Scrypt.NET</id>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <title>Scrypt.NET</title>
         <authors>Vinicius Chiele</authors>
         <owners>Vinicius Chiele</owners>
