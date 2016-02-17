@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7A73E3DB-F7EF-4F58-8B10-56079BFE0460}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrypt", "src\Scrypt\Scrypt.csproj", "{F27E95A9-FC05-43D0-9801-00C496B497EA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4D4861C8-D3BE-436F-968C-6862C6FA8BCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScryptTests", "src\ScryptTests\ScryptTests.csproj", "{5E660C58-E032-401F-BFB6-138B47E6A744}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,9 +31,21 @@ Global
 		{F27E95A9-FC05-43D0-9801-00C496B497EA}.Release|x64.Build.0 = Release|Any CPU
 		{F27E95A9-FC05-43D0-9801-00C496B497EA}.Release|x86.ActiveCfg = Release|Any CPU
 		{F27E95A9-FC05-43D0-9801-00C496B497EA}.Release|x86.Build.0 = Release|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Release|x64.ActiveCfg = Release|Any CPU
+		{5E660C58-E032-401F-BFB6-138B47E6A744}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F27E95A9-FC05-43D0-9801-00C496B497EA} = {7A73E3DB-F7EF-4F58-8B10-56079BFE0460}
+		{5E660C58-E032-401F-BFB6-138B47E6A744} = {7A73E3DB-F7EF-4F58-8B10-56079BFE0460}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\Scrypt\Scrypt.csproj
@@ -68,8 +82,5 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
