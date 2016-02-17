@@ -541,7 +541,7 @@ namespace Scrypt
         private static bool SafeEquals(string a, string b)
         {
             if (a.Length != b.Length) {
-                return False;
+                return false;
             }
             uint diff = 0;
  
