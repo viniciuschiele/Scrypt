@@ -2,8 +2,8 @@ language: csharp
 solution: Scrypt.sln
 install:
   - nuget restore Scrypt.sln
-  - nuget install xunit.runner.console -Version 2.1.0 -OutputDirectory testrunner
+  - nuget install xunit.runner.console -Version 2.1.0
 script:
   - xbuild /p:Configuration=Release Scrypt.sln
   - find . -type d
-  - mono ./testrunner/xunit.runner.console.2.1.0/tools/xunit.console.exe ./src/Scrypt.Tests/bin/Release/Scrypt.Tests.dll
+  - mono ./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe ./src/Scrypt.Tests/bin/Release/Scrypt.Tests.dll
