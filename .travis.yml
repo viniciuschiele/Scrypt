@@ -2,7 +2,7 @@ language: csharp
 solution: Scrypt.sln
 install:
   - nuget restore Scrypt.sln
-  - nuget install xunit.runner.console -Version 2.1.0
+  - nuget install xunit.runner.console -Version 2.1.0 -OutputDirectory packages
 script:
   - xbuild /p:Configuration=Release Scrypt.sln
   - find . -type d
