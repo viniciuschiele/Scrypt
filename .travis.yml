@@ -1,0 +1,5 @@
+language: csharp
+solution: Scrypt.sln
+script:
+  - xbuild /p:Configuration=Release Scrypt.sln
+  - mono ./packages/xunit.runner.console.2.1.0/tools/xunit.console.exe ./src/Scrypt.Tests/bin/Release/Scrypt.Tests.dll
