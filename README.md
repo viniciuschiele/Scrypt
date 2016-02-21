@@ -1,4 +1,6 @@
 #Scrypt.NET
+[![Build Status](https://travis-ci.org/viniciuschiele/Scrypt.svg)](https://travis-ci.org/viniciuschiele/Scrypt)
+
 scrypt is a password hash algorithm created by [Tarsnap](http://www.tarsnap.com/scrypt.html) in 2012 that allow us to protect passwords stored on databases against brute force attacks.
 
 This .NET implementation of scrypt is a port of [original implementation in C](http://www.tarsnap.com/scrypt.html), which generates the same hash as the original implementation does. This implementation is fast but not as fast as original one because the original one is written in C and it uses SIMD instructions.
