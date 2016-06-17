@@ -28,3 +28,4 @@ nuget.exe
 #*.sln
 #*.csproj
 #*.kproj
+*.lock.json

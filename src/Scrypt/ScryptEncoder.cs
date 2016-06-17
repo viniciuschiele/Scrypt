@@ -33,8 +33,11 @@ namespace Scrypt
         /// <summary>
         /// Default salt generator.
         /// </summary>
+#if COREFX
+        private static RandomNumberGenerator DefaultSaltGenereator = RandomNumberGenerator.Create();
+#else
         private static RandomNumberGenerator DefaultSaltGenereator = new RNGCryptoServiceProvider();
-
+#endif
         /// <summary>
         /// Size of salt in bytes.
         /// </summary>
@@ -505,6 +508,10 @@ namespace Scrypt
 
             Buffer.BlockCopy(salt, 0, saltBuffer, 0, saltLength);
 
+#if COREFX
+            using (var incrementalHasher = IncrementalHash.CreateHMAC(HashAlgorithmName.SHA256, mac.Key))
+            {
+#endif
             for (int i = 1; i <= blockCount; i++)
             {
                 saltBuffer[saltLength + 0] = (byte)(i >> 24);
@@ -513,15 +520,24 @@ namespace Scrypt
                 saltBuffer[saltLength + 3] = (byte)(i);
 
                 mac.Initialize();
+#if COREFX
+                incrementalHasher.AppendData(saltBuffer, 0, saltBuffer.Length);
+                Buffer.BlockCopy(incrementalHasher.GetHashAndReset(), 0, U, 0, U.Length);
+#else
                 mac.TransformFinalBlock(saltBuffer, 0, saltBuffer.Length);
                 Buffer.BlockCopy(mac.Hash, 0, U, 0, U.Length);
+#endif
                 Buffer.BlockCopy(U, 0, T, 0, 32);
 
                 for (long j = 1; j < iterationCount; j++)
                 {
+#if COREFX
+                    incrementalHasher.AppendData(U, 0, U.Length); 
+                    Buffer.BlockCopy(incrementalHasher.GetHashAndReset(), 0, U, 0, U.Length); 
+#else
                     mac.TransformFinalBlock(U, 0, U.Length);
                     Buffer.BlockCopy(mac.Hash, 0, U, 0, U.Length);
-
+#endif
                     for (int k = 0; k < 32; k++)
                     {
                         T[k] ^= U[k];
@@ -530,6 +546,9 @@ namespace Scrypt
 
                 Buffer.BlockCopy(T, 0, derivedKey, (i - 1) * 32, (i == blockCount ? r : 32));
             }
+#if COREFX
+            }
+#endif
         }
         
         /// <summary>
@@ -551,7 +570,6 @@ namespace Scrypt
  
             return diff == 0;
         }
-
         #endregion
     }
 }
