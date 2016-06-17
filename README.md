@@ -7,6 +7,10 @@ This .NET implementation of scrypt is a port of [original implementation in C](h
 
 If you would like to know further about hashing algorithms and how to protect passwords I really recommend you to read that article [Password Hashing](https://crackstation.net/hashing-security.htm).
 
+##Requirements
+.NET 2.0 and above or .NET Core
+
+
 ##Examples
 Generating a new hash for a password:
 ```csharp
@@ -23,10 +27,11 @@ ScryptEncoder encoder = new ScryptEncoder();
 bool areEquals = encoder.Compare("mypassword", hashedPassword);
 ```
 
-It works perfectly in Linux and OSX using [mono](http://www.mono-project.com), I'm not sure about mobile phones but I believe that it should work as well. 
+It is compatible with .NET Core and it works perfectly in Linux and OSX using [mono](http://www.mono-project.com) or the .NET Core, I'm not sure about mobile phones but I believe that it should work as well. 
 
 ##Install
 Install via NuGet: Install-Package Scrypt.NET
+
 
 ##Feedback
 Please use the [Issues](https://github.com/viniciuschiele/scrypt/issues) for feature requests and troubleshooting usage.
