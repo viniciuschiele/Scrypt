@@ -116,8 +116,11 @@ namespace Scrypt
             int threadCount;
             byte[] saltBytes;
 
-            ExtractHeader(hashedPassword, out iterationCount, out blockSize, out threadCount, out saltBytes);
-
+            if (!ExtractHeader(hashedPassword, out iterationCount, out blockSize, out threadCount, out saltBytes))
+            {
+                return false;
+            }
+            
             return SafeEquals(Encode(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
         }
 
@@ -165,13 +168,17 @@ namespace Scrypt
         /// <summary>
         /// Extracts header from a hashed password.
         /// </summary>
-        private static void ExtractHeader(string hashedPassword, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
+        private static bool ExtractHeader(string hashedPassword, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
         {
             var parts = hashedPassword.Split('$');
 
             if (parts.Length != 5 || parts[1] != "s0")
             {
-                throw new ArgumentException("Invalid hashed password", "hashedPassword");
+                iterationCount = -1;
+                blockSize = -1;
+                threadCount = -1;
+                saltBytes = new byte[0];
+                return false;
             }
 
             var config = Convert.ToInt64(parts[2], 16);
@@ -181,6 +188,7 @@ namespace Scrypt
             threadCount = (int)config & 0xff;
 
             saltBytes = Convert.FromBase64String(parts[3]);
+            return true;
         }
 
         /// <summary>
