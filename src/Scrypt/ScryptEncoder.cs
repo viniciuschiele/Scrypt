@@ -139,6 +139,20 @@ namespace Scrypt
         }
 
         /// <summary>
+        /// Checks if the given hash is a valid scrypt hash
+        /// </summary>
+        public bool IsValid(string hashedPassword)
+        {
+            if (string.IsNullOrEmpty(hashedPassword))
+            {
+                return false;
+            }
+
+            var parts = hashedPassword.Split('$');
+            return parts.Length == 5 && parts[1] == "s0";
+        }
+
+        /// <summary>
         /// Hash a password using the scrypt scheme.
         /// </summary>
         private static string Encode(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
@@ -165,14 +179,14 @@ namespace Scrypt
         /// <summary>
         /// Extracts header from a hashed password.
         /// </summary>
-        private static void ExtractHeader(string hashedPassword, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
+        private void ExtractHeader(string hashedPassword, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
         {
-            var parts = hashedPassword.Split('$');
-
-            if (parts.Length != 5 || parts[1] != "s0")
+            if (!IsValid(hashedPassword))
             {
                 throw new ArgumentException("Invalid hashed password", "hashedPassword");
             }
+
+            var parts = hashedPassword.Split('$');
 
             var config = Convert.ToInt64(parts[2], 16);
 
