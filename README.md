@@ -8,7 +8,7 @@ This .NET implementation of scrypt is a port of [original implementation in C](h
 If you would like to know further about hashing algorithms and how to protect passwords I really recommend you to read that article [Password Hashing](https://crackstation.net/hashing-security.htm).
 
 ##Requirements
-.NET 2.0 and above or .NET Core
+.NET 2.0 or .NET Core
 
 
 ##Examples
@@ -26,6 +26,9 @@ ScryptEncoder encoder = new ScryptEncoder();
 
 bool areEquals = encoder.Compare("mypassword", hashedPassword);
 ```
+
+The recommended parameters for interactive logins as of 2009 are iterationCount=16384, blockSize=8, threadCount=1, those are the default values.
+They should be increased as memory latency and CPU parallelism increases.
 
 It is compatible with .NET Core and it works perfectly in Linux and OSX using [mono](http://www.mono-project.com) or the .NET Core, I'm not sure about mobile phones but I believe that it should work as well. 
 
