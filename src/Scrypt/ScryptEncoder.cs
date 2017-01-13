@@ -42,7 +42,7 @@ namespace Scrypt
         /// Size of salt in bytes.
         /// </summary>
         private const int SaltLength = 32;
-        private const int DefaultIterationCount = 14;
+        private const int DefaultIterationCount = 16384;
         private const int DefaultBlockSize = 8;
         private const int DefaultThreadCount = 1;
 
@@ -76,6 +76,11 @@ namespace Scrypt
         /// </summary>
         public ScryptEncoder(int iterationCount, int blockSize, int threadCount, RandomNumberGenerator saltGenerator)
         {
+            if (iterationCount < 1)
+            {
+                throw new ArgumentOutOfRangeException("iterationCount", "IterationCount must be equal or greater than 1.");
+            }
+
             if (blockSize < 1)
             {
                 throw new ArgumentOutOfRangeException("blockSize", "BlockSize must be equal or greater than 1.");
@@ -111,14 +116,20 @@ namespace Scrypt
                 throw new ArgumentNullException("hashedPassword");
             }
 
+            int version;
             int iterationCount;
             int blockSize;
             int threadCount;
             byte[] saltBytes;
 
-            ExtractHeader(hashedPassword, out iterationCount, out blockSize, out threadCount, out saltBytes);
+            ExtractHeader(hashedPassword, out version, out iterationCount, out blockSize, out threadCount, out saltBytes);
 
-            return SafeEquals(Encode(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
+            if (version == 0)
+            {
+                return SafeEquals(EncodeV0(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
+            }
+
+            return SafeEquals(EncodeV1(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
         }
 
         /// <summary>
@@ -135,7 +146,7 @@ namespace Scrypt
 
             _saltGenerator.GetBytes(saltBytes);
 
-            return Encode(password, saltBytes, _iterationCount, _blockSize, _threadCount);
+            return EncodeV1(password, saltBytes, _iterationCount, _blockSize, _threadCount);
         }
 
         /// <summary>
@@ -149,15 +160,30 @@ namespace Scrypt
             }
 
             var parts = hashedPassword.Split('$');
-            return parts.Length == 5 && parts[1] == "s0";
+
+            if (parts.Length != 5)
+            {
+                return false;
+            }
+
+            if (parts[1] != "s0" && parts[1] != "s1")
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
         /// Hash a password using the scrypt scheme.
+        /// 
+        /// This is a DEPRECATED version.
+        /// This version was applying a Math.Pow on top of iterationCount 
+        /// which is completely wrong.
         /// </summary>
-        private static string Encode(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
+        private static string EncodeV0(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
         {
-            var N = (long)Math.Pow(2, iterationCount);
+            var N = (int)Math.Pow(2, iterationCount);
             var r = blockSize;
             var p = threadCount;
 
@@ -165,7 +191,7 @@ namespace Scrypt
 
             var hashed = CryptoScrypt(passwordBytes, saltBytes, N, r, p);
 
-            var config = Convert.ToString(iterationCount << 16 | blockSize << 8 | threadCount, 16);
+            var config = Convert.ToString(iterationCount << 16 | r << 8 | p, 16);
 
             var sb = new StringBuilder();
 
@@ -177,9 +203,38 @@ namespace Scrypt
         }
 
         /// <summary>
+        /// Hash a password using the scrypt scheme.
+        /// </summary>
+        private static string EncodeV1(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
+        {
+            var N = iterationCount;
+            var r = blockSize;
+            var p = threadCount;
+
+            if (N <= 1 || (N & (N - 1)) != 0)
+            {
+                throw new ArgumentException("iterationCount must be a power of two greater than 1", "iterationCount");
+            }
+
+            var passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            var hashed = CryptoScrypt(passwordBytes, saltBytes, N, r, p);
+
+            var config = Convert.ToString(N << 16 | r << 8 | p, 16);
+
+            var sb = new StringBuilder();
+
+            sb.Append("$s1$").Append(config).Append('$');
+            sb.Append(Convert.ToBase64String(saltBytes)).Append('$');
+            sb.Append(Convert.ToBase64String(hashed));
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Extracts header from a hashed password.
         /// </summary>
-        private void ExtractHeader(string hashedPassword, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
+        private void ExtractHeader(string hashedPassword, out int version, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
         {
             if (!IsValid(hashedPassword))
             {
@@ -190,6 +245,7 @@ namespace Scrypt
 
             var config = Convert.ToInt64(parts[2], 16);
 
+            version = parts[1][1] == '1' ? 1 : 0;
             iterationCount = (int)config >> 16 & 0xffff;
             blockSize = (int)config >> 8 & 0xff;
             threadCount = (int)config & 0xff;
@@ -417,7 +473,7 @@ namespace Scrypt
         /// power of 2 greater than 1.  The arrays B, V, and XY must be aligned to a
         /// multiple of 64 bytes.
         /// </summary>
-        private unsafe static void SMix(byte* B, int r, long N, uint* V, uint* XY)
+        private unsafe static void SMix(byte* B, int r, int N, uint* V, uint* XY)
         {
             var X = XY;
             var Y = &XY[32 * r];
@@ -446,10 +502,10 @@ namespace Scrypt
             }
 
             /* 6: for i = 0 to N - 1 do */
-            for (long i = 0, j = 0; i < N; i += 2)
+            for (var i = 0; i < N; i += 2)
             {
                 /* 7: j <-- Integerify(X) mod N */
-                j = Integerify(X, r) & (N - 1);
+                var j = Integerify(X, r) & (N - 1);
 
                 /* 8: X <-- H(X \xor V_j) */
                 BulkXor(X, &V[j * (32 * r)], 128 * r);
@@ -473,7 +529,7 @@ namespace Scrypt
         /// <summary>
         /// Compute and returns the result.
         /// </summary>
-        private unsafe static byte[] CryptoScrypt(byte[] password, byte[] salt, long N, int r, int p)
+        private unsafe static byte[] CryptoScrypt(byte[] password, byte[] salt, int N, int r, int p)
         {
             var Ba = new byte[128 * r * p + 63];
             var XYa = new byte[256 * r + 63];
@@ -564,7 +620,7 @@ namespace Scrypt
             }
 #endif
         }
-        
+
         /// <summary>
         /// Checks if two strings are equal. Compares every char to prevent timing attacks.
         /// </summary>
@@ -573,15 +629,17 @@ namespace Scrypt
         /// <returns>True if both strings are equal</returns>
         private static bool SafeEquals(string a, string b)
         {
-            if (a.Length != b.Length) {
+            if (a.Length != b.Length)
+            {
                 return false;
             }
             uint diff = 0;
- 
-            for (int i = 0; i < a.Length; i++) {
+
+            for (int i = 0; i < a.Length; i++)
+            {
                 diff |= (uint)a[i] ^ (uint)b[i];
             }
- 
+
             return diff == 0;
         }
         #endregion
