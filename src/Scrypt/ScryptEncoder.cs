@@ -312,6 +312,7 @@ namespace Scrypt
                 iterationCount = Convert.ToInt32(parts[2]);
                 blockSize = Convert.ToInt32(parts[3]);
                 threadCount = Convert.ToInt32(parts[4]);
+                saltBytes = Convert.FromBase64String(parts[5]);
             }
             else 
             {
@@ -319,9 +320,8 @@ namespace Scrypt
                 iterationCount = (int)config >> 16 & 0xffff;
                 blockSize = (int)config >> 8 & 0xff;
                 threadCount = (int)config & 0xff;
+                saltBytes = Convert.FromBase64String(parts[3]);
             }
-
-            saltBytes = Convert.FromBase64String(parts[3]);
         }
 
         /// <summary>
