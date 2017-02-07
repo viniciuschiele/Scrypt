@@ -124,12 +124,17 @@ namespace Scrypt
 
             ExtractHeader(hashedPassword, out version, out iterationCount, out blockSize, out threadCount, out saltBytes);
 
-            if (version == 0)
+            if (version == 2)
             {
-                return SafeEquals(EncodeV0(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
+                return SafeEquals(EncodeV2(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
+            }
+            
+            if (version == 1)
+            {
+                return SafeEquals(EncodeV1(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
             }
 
-            return SafeEquals(EncodeV1(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
+            return SafeEquals(EncodeV0(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
         }
 
         /// <summary>
@@ -146,7 +151,7 @@ namespace Scrypt
 
             _saltGenerator.GetBytes(saltBytes);
 
-            return EncodeV1(password, saltBytes, _iterationCount, _blockSize, _threadCount);
+            return EncodeV2(password, saltBytes, _iterationCount, _blockSize, _threadCount);
         }
 
         /// <summary>
@@ -161,14 +166,35 @@ namespace Scrypt
 
             var parts = hashedPassword.Split('$');
 
-            if (parts.Length != 5)
+            if (parts.Length < 2)
             {
                 return false;
             }
 
-            if (parts[1] != "s0" && parts[1] != "s1")
+            int version;
+            if (!int.TryParse(parts[1].TrimStart('s'), out version))
             {
                 return false;
+            }
+
+            if (version < 0 || version > 2)
+            {
+                return false;
+            }
+
+            if (version == 2) 
+            {
+                if (parts.Length != 7)
+                {
+                    return false;
+                }
+            }
+            else if (version <= 1)
+            {
+                if (parts.Length != 5)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -176,34 +202,43 @@ namespace Scrypt
 
         /// <summary>
         /// Hash a password using the scrypt scheme.
-        /// 
-        /// This is a DEPRECATED version.
-        /// This version was applying a Math.Pow on top of iterationCount 
-        /// which is completely wrong.
         /// </summary>
-        private static string EncodeV0(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
+        private static string EncodeV2(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
         {
-            var N = (int)Math.Pow(2, iterationCount);
+            var N = iterationCount;
             var r = blockSize;
             var p = threadCount;
+
+            if (N <= 1 || (N & (N - 1)) != 0)
+            {
+                throw new ArgumentException("iterationCount must be a power of two greater than 1", "iterationCount");
+            }
+
+            if ((ulong)r*(ulong)p >= 1<<30 || r > Int32.MaxValue/128/p || r > Int32.MaxValue/256 || N > Int32.MaxValue/128/r)
+            {
+                throw new ArgumentException("Parameters are too large");
+            }
 
             var passwordBytes = Encoding.UTF8.GetBytes(password);
 
             var hashed = CryptoScrypt(passwordBytes, saltBytes, N, r, p);
 
-            var config = Convert.ToString(iterationCount << 16 | r << 8 | p, 16);
-
             var sb = new StringBuilder();
 
-            sb.Append("$s0$").Append(config).Append('$');
+            sb.Append("$s2$");
+            sb.Append(iterationCount.ToString()).Append('$');
+            sb.Append(blockSize.ToString()).Append('$');
+            sb.Append(threadCount.ToString()).Append('$');
             sb.Append(Convert.ToBase64String(saltBytes)).Append('$');
             sb.Append(Convert.ToBase64String(hashed));
 
             return sb.ToString();
         }
-
+        
         /// <summary>
         /// Hash a password using the scrypt scheme.
+        /// This is a DEPRECATED version.
+        /// This version was storing the iterationCount in 2 bytes which is not enough.
         /// </summary>
         private static string EncodeV1(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
         {
@@ -232,6 +267,33 @@ namespace Scrypt
         }
 
         /// <summary>
+        /// Hash a password using the scrypt scheme.
+        /// 
+        /// This is a DEPRECATED version.
+        /// This version was applying a Math.Pow on top of iterationCount which is completely wrong.
+        /// </summary>
+        private static string EncodeV0(string password, byte[] saltBytes, int iterationCount, int blockSize, int threadCount)
+        {
+            var N = (int)Math.Pow(2, iterationCount);
+            var r = blockSize;
+            var p = threadCount;
+
+            var passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            var hashed = CryptoScrypt(passwordBytes, saltBytes, N, r, p);
+
+            var config = Convert.ToString(iterationCount << 16 | r << 8 | p, 16);
+
+            var sb = new StringBuilder();
+
+            sb.Append("$s0$").Append(config).Append('$');
+            sb.Append(Convert.ToBase64String(saltBytes)).Append('$');
+            sb.Append(Convert.ToBase64String(hashed));
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Extracts header from a hashed password.
         /// </summary>
         private void ExtractHeader(string hashedPassword, out int version, out int iterationCount, out int blockSize, out int threadCount, out byte[] saltBytes)
@@ -243,12 +305,21 @@ namespace Scrypt
 
             var parts = hashedPassword.Split('$');
 
-            var config = Convert.ToInt64(parts[2], 16);
+            version = Convert.ToInt32(parts[1][1]);
 
-            version = parts[1][1] == '1' ? 1 : 0;
-            iterationCount = (int)config >> 16 & 0xffff;
-            blockSize = (int)config >> 8 & 0xff;
-            threadCount = (int)config & 0xff;
+            if (version >= 2)
+            {                
+                iterationCount = Convert.ToInt32(parts[2]);
+                blockSize = Convert.ToInt32(parts[3]);
+                threadCount = Convert.ToInt32(parts[4]);
+            }
+            else 
+            {
+                var config = Convert.ToInt64(parts[2], 16);
+                iterationCount = (int)config >> 16 & 0xffff;
+                blockSize = (int)config >> 8 & 0xff;
+                threadCount = (int)config & 0xff;
+            }
 
             saltBytes = Convert.FromBase64String(parts[3]);
         }
