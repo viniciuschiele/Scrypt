@@ -128,7 +128,7 @@ namespace Scrypt
             {
                 return SafeEquals(EncodeV2(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
             }
-            
+
             if (version == 1)
             {
                 return SafeEquals(EncodeV1(password, saltBytes, iterationCount, blockSize, threadCount), hashedPassword);
@@ -166,16 +166,12 @@ namespace Scrypt
 
             var parts = hashedPassword.Split('$');
 
-            if (parts.Length < 2)
+            if (parts.Length < 2 || parts[1].Length != 2)
             {
                 return false;
             }
 
-            int version;
-            if (!int.TryParse(parts[1].TrimStart('s'), out version))
-            {
-                return false;
-            }
+            int version = parts[1][1] - '0';
 
             if (version < 0 || version > 2)
             {
@@ -305,7 +301,7 @@ namespace Scrypt
 
             var parts = hashedPassword.Split('$');
 
-            version = Convert.ToInt32(parts[1][1]);
+            version = parts[1][1] - '0';
 
             if (version >= 2)
             {                
