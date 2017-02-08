@@ -15,7 +15,7 @@
         <tags>scrypt,password,hash,hashing,crypto,cryptographic,cryptography</tags>
     </metadata>
     <files>
-        <file src="..\Documents\GitHub\Scrypt\src\Scrypt.Net20\bin\Release\Scrypt.dll" target="lib\net20\Scrypt.dll" />
-        <file src="..\Documents\GitHub\Scrypt\src\Scrypt.Core\bin\Release\netstandard1.4\Scrypt.dll" target="lib\netstandard1.4\Scrypt.dll" />
+        <file src="src\Scrypt.Net20\bin\Release\Scrypt.dll" target="lib\net20\Scrypt.dll" />
+        <file src="src\Scrypt.Core\bin\Release\netstandard1.4\Scrypt.dll" target="lib\netstandard1.4\Scrypt.dll" />
     </files>
 </package>
