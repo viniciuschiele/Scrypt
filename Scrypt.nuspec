@@ -2,14 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Scrypt.NET</id>
-        <version>1.2.0</version>
+        <version>1.3.0</version>
         <title>Scrypt.NET</title>
         <authors>Vinicius Chiele</authors>
         <owners>Vinicius Chiele</owners>
         <projectUrl>https://github.com/viniciuschiele/scrypt</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A .NET implementation of scrypt algorithm.</description>
-        <releaseNotes>1.2.0 - Fix issue
+        <releaseNotes>1.3.0 - Fix issues
+1.2.0 - Add IsValid method
 1.1.0 - Add compatibility to .NET Core</releaseNotes>
         <language>en-US</language>
         <tags>scrypt,password,hash,hashing,crypto,cryptographic,cryptography</tags>
