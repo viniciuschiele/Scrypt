@@ -178,7 +178,7 @@ namespace Scrypt
                 return false;
             }
 
-            if (version == 2) 
+            if (version == 2)
             {
                 if (parts.Length != 7)
                 {
@@ -210,7 +210,7 @@ namespace Scrypt
                 throw new ArgumentException("iterationCount must be a power of two greater than 1", "iterationCount");
             }
 
-            if ((ulong)r*(ulong)p >= 1<<30 || r > Int32.MaxValue/128/p || r > Int32.MaxValue/256 || N > Int32.MaxValue/128/r)
+            if ((ulong)r * (ulong)p >= 1 << 30 || r > Int32.MaxValue / 128 / p || r > Int32.MaxValue / 256 || N > Int32.MaxValue / 128 / r)
             {
                 throw new ArgumentException("Parameters are too large");
             }
@@ -230,7 +230,7 @@ namespace Scrypt
 
             return sb.ToString();
         }
-        
+
         /// <summary>
         /// Hash a password using the scrypt scheme.
         /// This is a DEPRECATED version.
@@ -304,13 +304,13 @@ namespace Scrypt
             version = parts[1][1] - '0';
 
             if (version >= 2)
-            {                
+            {
                 iterationCount = Convert.ToInt32(parts[2]);
                 blockSize = Convert.ToInt32(parts[3]);
                 threadCount = Convert.ToInt32(parts[4]);
                 saltBytes = Convert.FromBase64String(parts[5]);
             }
-            else 
+            else
             {
                 var config = Convert.ToInt64(parts[2], 16);
                 iterationCount = (int)config >> 16 & 0xffff;
@@ -596,12 +596,12 @@ namespace Scrypt
         /// <summary>
         /// Compute and returns the result.
         /// </summary>
-        private unsafe static byte[] CryptoScrypt(byte[] password, byte[] salt, int N, int r, int p)
+        public unsafe static byte[] CryptoScrypt(byte[] password, byte[] salt, int N, int r, int p, int keyLength = 32)
         {
             var Ba = new byte[128 * r * p + 63];
             var XYa = new byte[256 * r + 63];
             var Va = new byte[128 * r * N + 63];
-            var buf = new byte[32];
+            var buf = new byte[keyLength];
 
             var mac = new HMACSHA256(password);
 
