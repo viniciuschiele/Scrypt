@@ -41,7 +41,8 @@ namespace Scrypt
         /// <summary>
         /// Size of salt in bytes.
         /// </summary>
-        private const int SaltLength = 32;
+        public static readonly int SaltLength = 32;
+
         private const int DefaultIterationCount = 16384;
         private const int DefaultBlockSize = 8;
         private const int DefaultThreadCount = 1;
@@ -49,9 +50,12 @@ namespace Scrypt
         private readonly int _iterationCount;
         private readonly int _blockSize;
         private readonly int _threadCount;
+        private readonly byte[] _salt;
         private readonly RandomNumberGenerator _saltGenerator;
 
         #endregion
+
+
 
         #region Constructors
 
@@ -94,6 +98,7 @@ namespace Scrypt
             _iterationCount = iterationCount;
             _blockSize = blockSize;
             _threadCount = threadCount;
+            _salt = new byte[SaltLength];
             _saltGenerator = saltGenerator;
         }
 
@@ -147,11 +152,9 @@ namespace Scrypt
                 throw new ArgumentNullException("password");
             }
 
-            var saltBytes = new byte[SaltLength];
+            _saltGenerator.GetBytes(_salt);
 
-            _saltGenerator.GetBytes(saltBytes);
-
-            return EncodeV2(password, saltBytes, _iterationCount, _blockSize, _threadCount);
+            return EncodeV2(password, _salt, _iterationCount, _blockSize, _threadCount);
         }
 
         /// <summary>
@@ -194,6 +197,44 @@ namespace Scrypt
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Hashes a password using the scrypt scheme.
+        /// </summary>
+        public static string Encode(int iterationCount, int blockSize, int threadCount, byte[] salt, string password)
+        {
+            if (iterationCount < 1)
+            {
+                throw new ArgumentOutOfRangeException("iterationCount", "IterationCount must be equal or greater than 1.");
+            }
+
+            if (blockSize < 1)
+            {
+                throw new ArgumentOutOfRangeException("blockSize", "BlockSize must be equal or greater than 1.");
+            }
+
+            if (threadCount < 1)
+            {
+                throw new ArgumentOutOfRangeException("threadCount", "ThreadCount must be equal or greater than 1.");
+            }
+
+            if (salt == null)
+            {
+                throw new ArgumentNullException("salt");
+            }
+
+            if (salt.Length != SaltLength)
+            {
+                throw new ArgumentOutOfRangeException("salt", String.Format("Salt length must be equal to {0} bytes.", SaltLength));
+            }
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentNullException("password");
+            }
+
+            return EncodeV2(password, salt, iterationCount, blockSize, threadCount);
         }
 
         /// <summary>
