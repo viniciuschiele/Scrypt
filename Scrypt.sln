@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7A73E3DB-F7EF-4F58-8B10-56079BFE0460}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrypt.Net20", "src\Scrypt.Net20\Scrypt.Net20.csproj", "{F27E95A9-FC05-43D0-9801-00C496B497EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrypt.Tests", "src\Scrypt.Tests\Scrypt.Tests.csproj", "{4AB836C3-5041-470C-ABE8-04C475952017}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrypt.Core", "src\Scrypt.Core\Scrypt.Core.csproj", "{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,18 @@ Global
 		{4AB836C3-5041-470C-ABE8-04C475952017}.Release|x64.Build.0 = Release|Any CPU
 		{4AB836C3-5041-470C-ABE8-04C475952017}.Release|x86.ActiveCfg = Release|Any CPU
 		{4AB836C3-5041-470C-ABE8-04C475952017}.Release|x86.Build.0 = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|x64.Build.0 = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Debug|x86.Build.0 = Debug|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|x64.ActiveCfg = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|x64.Build.0 = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|x86.ActiveCfg = Release|Any CPU
+		{24286B6A-BE93-463E-A22B-D27AAC1D5CCA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +60,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F27E95A9-FC05-43D0-9801-00C496B497EA} = {7A73E3DB-F7EF-4F58-8B10-56079BFE0460}
 		{4AB836C3-5041-470C-ABE8-04C475952017} = {7A73E3DB-F7EF-4F58-8B10-56079BFE0460}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4E858E0-3604-41D3-9BDE-8FC7500BC607}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\Scrypt\Scrypt.csproj
